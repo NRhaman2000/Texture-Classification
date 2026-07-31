@@ -21,6 +21,7 @@ Run this command in your terminal to install the dependencies:
 
 > pip install torch torchvision scikit-learn scikit-image matplotlib numpy scipy
 
+*Note: for Mac/Linux it is "pip3" and for Windows it is "pip".*
 *Note: The PyTorch code is optimized to automatically detect and utilize Apple Silicon (`mps`), Nvidia GPUs (`cuda`), or default to `cpu` if no hardware accelerator is found.*
 
 ## How to Run the Project
