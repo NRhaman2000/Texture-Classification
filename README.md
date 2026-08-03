@@ -1,59 +1,44 @@
-# Texture Classification: Classical vs. Deep Learning Approaches
+# 🚀 Texture Classification: From Classical Machine Learning to Deep Learning Ensembles
 
-This repository contains a computer vision pipeline that compares classical hand-crafted feature extraction against modern deep learning techniques for texture classification. 
+Welcome to the Texture Classification project! This repository contains a complete, end-to-end computer vision pipeline that compares classical hand-crafted feature extraction against state-of-the-art deep learning neural networks.
 
-The project utilizes the **Describable Textures Dataset (DTD)**, which contains 47 distinct texture categories (e.g., woven, banded, bubbly, cracked).
+## 🧠 What is this project?
 
-## Project Overview
+Identifying textures (like whether a surface is "woven," "bubbly," or "cracked") is a notoriously difficult task for computers. Unlike objects (which have clear shapes and edges), textures are defined by highly repetitive, fine-grained, and often overlapping visual patterns. 
 
-This project serves as an exploration of how different machine learning architectures handle complex, highly variable texture data. The experiment is broken down into four distinct stages:
+This project explores how machine learning has evolved to solve this problem. It uses the **Describable Textures Dataset (DTD)**, which contains 47 distinct and highly complex texture categories.
 
-1. **The Classical Baseline:** Uses a Gabor Filter Bank to extract hand-crafted mathematical summaries of textures, classified by a Support Vector Machine (SVM).
-2. **The Shallow CNN:** A basic Convolutional Neural Network trained from scratch to learn its own texture filters.
-3. **The Over-Regularized CNN:** An attempt to fix overfitting using heavy Data Augmentation and 50% Dropout (which resulted in underfitting).
-4. **The Balanced CNN:** The final, optimized architecture utilizing 3 convolutional layers, gentle augmentations, and 20% Dropout.
+By running the scripts in this repository, you will trace the evolution of computer vision:
+1. **Classical Era:** Using mathematical formulas (Gabor Filters) and a Support Vector Machine (SVM).
+2. **Early Deep Learning:** Building Custom Convolutional Neural Networks (CNNs) from scratch.
+3. **The Modern Era:** Fine-tuning massive, pre-trained architectures (EfficientNetV2, ConvNeXt) and combining their "brains" into a Dual Ensemble for maximum accuracy.
 
-## Requirements
+---
 
-To run this project locally, you will need Python 3.x installed along with the following libraries. 
+## 📂 Project Structure
 
-Run this command in your terminal to install the dependencies:
+Here is a quick guide to what each script does. They are meant to be run in this order to see the accuracy improve!
 
-> pip install torch torchvision scikit-learn scikit-image matplotlib numpy scipy
+| File Name | Description |
+| :--- | :--- |
+| `Tex_class.py` | **Data Setup:** Downloads the DTD dataset and tests the data loader. |
+| `Tex_class_classical.py` | **Classical Baseline:** Extracts Gabor filters and trains an SVM. |
+| `Tex_class_cnn.py` | **Basic CNN:** A simple 2-layer network (demonstrates overfitting). |
+| `Tex_class_cnn_improved.py`| **Over-Regularized CNN:** Adds heavy augmentation and 50% dropout. |
+| `Tex_class_cnn_balanced.py`| **Balanced CNN:** A fully optimized 3-layer custom network. |
+| `Tex_class_transfer.py` | **ResNet-50:** Uses Transfer Learning to jumpstart accuracy. |
+| `Tex_class_sota.py` | **EfficientNetV2:** True fine-tuning of a modern architecture. |
+| `Tex_class_ultimate.py` | **ConvNeXt-Tiny:** Introduces Test-Time Augmentation (TTA). |
+| `Tex_class_ensemble.py` | **The Final Boss:** Trains two modern models and averages their predictions. |
 
-*Note: for Mac/Linux it is "pip3" and for Windows it is "pip". The PyTorch code is optimized to automatically detect and utilize Apple Silicon (`mps`), Nvidia GPUs (`cuda`), or default to `cpu` if no hardware accelerator is found.*
+---
 
-## How to Run the Project
+## ⚙️ Prerequisites & Installation
 
-You must run the scripts in the following order. The first script downloads the dataset, and the subsequent scripts evaluate the different models.
+To run this project on your local machine, you will need **Python 3.8+** installed. 
 
-### 1. Download and Prepare the Data
-Run the main script first. This will automatically download the DTD dataset via `torchvision` and verify that the data loader is working by displaying a sample batch of 4 images.
-`python Tex_class.py`
-
-### 2. Run the Classical Pipeline
-This script rubs a mathematical Gabor filter bank over the dataset to extract features and trains an SVM. It will output the accuracy and display a confusion matrix.
-`python Tex_class_classical.py`
-
-### 3. Run the Deep Learning Baseline
-This script trains a simple 2-layer CNN. You will notice high training accuracy but poor test accuracy due to extreme overfitting.
-`python Tex_class_cnn.py`
-
-### 4. Run the Improved (Over-Regularized) CNN
-This script applies heavy data augmentation (rotations, flips) and 50% dropout. The model will underfit and default to random guessing.
-`python Tex_class_cnn_improved.py`
-
-### 5. Run the Final Balanced CNN
-This is the final, optimized model. It uses a 3-layer architecture, gentle horizontal flipping, and 20% dropout to achieve the best generalization on the test set.
-`python Tex_class_cnn_balanced.py`
-
-## Results Summary
-
-| Model | Architecture Details | Final Accuracy |
-| :--- | :--- | :--- |
-| **Classical Pipeline** | Gabor Filters + SVM | ~12.18% |
-| **Baseline CNN** | 2-Layer CNN (No Regularization) | ~11.33% |
-| **Improved CNN** | 2-Layer CNN + Heavy Augmentation + 50% Dropout | ~7.61% |
-| **Balanced CNN** | 3-Layer CNN + Gentle Augmentation + 20% Dropout | ~18.99% |
-
-The results successfully demonstrate that a properly balanced Convolutional Neural Network, capable of learning its own feature filters, outperforms classical hand-crafted mathematical filters for complex texture classification tasks.
+### 1. Clone the Repository
+Open your terminal or command prompt and run:
+```bash
+git clone [https://github.com/NRhaman2000/Texture-Classification.git](https://github.com/NRhaman2000/Texture-Classification.git)
+cd Texture-Classification
