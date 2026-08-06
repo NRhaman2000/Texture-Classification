@@ -18,8 +18,8 @@ transform = transforms.Compose([
 ])
 
 print("Loading dataset for CNN...")
-train_dataset = torchvision.datasets.DTD(root='./data', split='train', transform=transform)
-test_dataset = torchvision.datasets.DTD(root='./data', split='test', transform=transform)
+train_dataset = torchvision.datasets.DTD(root='./data', split='train', partition=1,transform=transform, download=True)
+test_dataset = torchvision.datasets.DTD(root='./data', split='test', partition=1,transform=transform, download=True)
 
 # Batch size of 32 is standard for training small networks
 train_loader = torch.utils.data.DataLoader(train_dataset, batch_size=32, shuffle=True)

@@ -10,3 +10,4 @@ data/
 # Ignore Python cache
 __pycache__/
 *.pyc
+features_cache.npz

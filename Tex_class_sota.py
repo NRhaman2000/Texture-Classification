@@ -29,8 +29,8 @@ test_transform = transforms.Compose([
 ])
 
 print("Loading dataset for SOTA Fine-Tuning...")
-train_dataset = torchvision.datasets.DTD(root='./data', split='train', transform=train_transform)
-test_dataset = torchvision.datasets.DTD(root='./data', split='test', transform=test_transform)
+train_dataset = torchvision.datasets.DTD(root='./data', split='train', partition=1,transform=train_transform, download=True)
+test_dataset = torchvision.datasets.DTD(root='./data', split='test', partition=1,transform=test_transform, download=True)
 
 # A batch size of 64 fits perfectly in 24GB of unified memory
 train_loader = torch.utils.data.DataLoader(train_dataset, batch_size=64, shuffle=True)
@@ -57,7 +57,7 @@ def get_model(num_classes):
     return model
 
 def main():
-    device = torch.device("mps" if torch.backends.mps.is_available() else "cpu")
+    device = torch.device("cuda" if torch.cuda.is_available() else "mps" if torch.backends.mps.is_available() else "cpu")
     print(f"Using device: {device}")
 
     model = get_model(num_classes).to(device)

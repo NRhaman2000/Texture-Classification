@@ -27,8 +27,8 @@ test_transform = transforms.Compose([
 ])
 
 print("Loading dataset with Data Augmentation...")
-train_dataset = torchvision.datasets.DTD(root='./data', split='train', transform=train_transform)
-test_dataset = torchvision.datasets.DTD(root='./data', split='test', transform=test_transform)
+train_dataset = torchvision.datasets.DTD(root='./data', split='train', partition=1,transform=train_transform, download=True)
+test_dataset = torchvision.datasets.DTD(root='./data', split='test', partition=1,transform=test_transform, download=True)
 
 train_loader = torch.utils.data.DataLoader(train_dataset, batch_size=32, shuffle=True)
 test_loader = torch.utils.data.DataLoader(test_dataset, batch_size=32, shuffle=False)

@@ -1,11 +1,12 @@
+import copy
+
 import torch
 import torchvision
 import torchvision.transforms as transforms
 import torch.nn as nn
 import torch.optim as optim
-import matplotlib.pyplot as plt
-from sklearn.metrics import accuracy_score, confusion_matrix, ConfusionMatrixDisplay
 
+from eval_utils import set_seed, report, plot_conv1_filters
 # ---------------------------------------------------------
 # 1. Gentle Transforms (Preserves directional textures)
 # ---------------------------------------------------------
@@ -23,10 +24,12 @@ test_transform = transforms.Compose([
 ])
 
 print("Loading dataset for Balanced CNN...")
-train_dataset = torchvision.datasets.DTD(root='./data', split='train', transform=train_transform)
-test_dataset = torchvision.datasets.DTD(root='./data', split='test', transform=test_transform)
+train_dataset = torchvision.datasets.DTD(root='./data', split='train', partition=1,transform=train_transform, download=True)
+val_dataset = torchvision.datasets.DTD(root='./data', split='val', partition=1,transform=test_transform, download=True)
+test_dataset = torchvision.datasets.DTD(root='./data', split='test', partition=1,transform=test_transform, download=True)
 
 train_loader = torch.utils.data.DataLoader(train_dataset, batch_size=32, shuffle=True)
+val_loader = torch.utils.data.DataLoader(val_dataset, batch_size=32, shuffle=False)
 test_loader = torch.utils.data.DataLoader(test_dataset, batch_size=32, shuffle=False)
 
 num_classes = len(train_dataset.classes)
@@ -39,7 +42,7 @@ class BalancedTextureCNN(nn.Module):
         super(BalancedTextureCNN, self).__init__()
         
         # Layer 1: Low-level features (edges, colors) -> outputs 32x32
-        self.conv1 = nn.Conv2d(3, 32, kernel_size=3, padding=1)
+        self.conv1 = nn.Conv2d(3, 32, kernel_size=7, padding=3)
         self.bn1 = nn.BatchNorm2d(32)
         self.relu1 = nn.ReLU()
         self.pool1 = nn.MaxPool2d(2, 2) 
@@ -72,66 +75,59 @@ class BalancedTextureCNN(nn.Module):
         return x
 
 def main():
-    device = torch.device("mps" if torch.backends.mps.is_available() else "cuda" if torch.cuda.is_available() else "cpu")
+    set_seed(42)
+    device = torch.device("cuda" if torch.cuda.is_available()
+                          else "mps" if torch.backends.mps.is_available() else "cpu")
     print(f"Using device: {device}")
 
     model = BalancedTextureCNN(num_classes=num_classes).to(device)
     criterion = nn.CrossEntropyLoss()
-    
-    # Adjusted Learning Rate to 0.0003 for stable optimization
-    optimizer = optim.Adam(model.parameters(), lr=0.0003, weight_decay=1e-5) 
+    optimizer = optim.Adam(model.parameters(), lr=0.0003, weight_decay=1e-5)
 
-    epochs = 20 
+    epochs = 60
+    best_state, best_val = None, -1.0
     print("\nStarting Training...")
-    
     for epoch in range(epochs):
-        model.train() 
+        # --- learn from the training pile ---
+        model.train()
         running_loss = 0.0
-        
-        for i, (images, labels) in enumerate(train_loader):
+        for images, labels in train_loader:
             images, labels = images.to(device), labels.to(device)
-            
-            optimizer.zero_grad()    
-            outputs = model(images)  
-            loss = criterion(outputs, labels) 
-            loss.backward()          
-            optimizer.step()         
-            
+            optimizer.zero_grad()
+            loss = criterion(model(images), labels)
+            loss.backward()
+            optimizer.step()
             running_loss += loss.item()
-            
-        print(f"Epoch [{epoch+1}/{epochs}] - Loss: {running_loss/len(train_loader):.4f}")
 
-    # ---------------------------------------------------------
-    # 3. Evaluate the Balanced CNN
-    # ---------------------------------------------------------
-    print("\nTesting the Balanced CNN...")
-    model.eval() 
-    all_preds = []
-    all_labels = []
+        # --- sit the practice test ---
+        model.eval()
+        correct = total = 0
+        with torch.no_grad():
+            for images, labels in val_loader:
+                preds = model(images.to(device)).argmax(1).cpu()
+                correct += (preds == labels).sum().item()
+                total += labels.size(0)
+        val_acc = correct / total
 
+        # --- if this is the best so far, save a snapshot ---
+        if val_acc > best_val:
+            best_val = val_acc
+            best_state = copy.deepcopy(model.state_dict())
+        print(f"Epoch [{epoch+1}/{epochs}] - Loss: {running_loss/len(train_loader):.4f}"
+              f" - Val: {val_acc*100:.1f}%")
+
+    model.load_state_dict(best_state)      # go back to the best version
+    torch.save(model.state_dict(), "cnn_best.pth")
+    plot_conv1_filters(model.conv1.weight) # saves cnn_conv1_filters.png
+
+    # --- the real exam, taken once ---
+    model.eval()
+    all_preds, all_labels = [], []
     with torch.no_grad():
         for images, labels in test_loader:
-            images = images.to(device)
-            outputs = model(images)
-            _, predicted = torch.max(outputs.data, 1) 
-            
-            all_preds.extend(predicted.cpu().numpy())
+            all_preds.extend(model(images.to(device)).argmax(1).cpu().numpy())
             all_labels.extend(labels.numpy())
-
-    accuracy = accuracy_score(all_labels, all_preds)
-    print(f"\n========================================")
-    print(f"BALANCED CNN ACCURACY: {accuracy * 100:.2f}%")
-    print(f"========================================\n")
-    
-    print("Generating Final Confusion Matrix...")
-    cm = confusion_matrix(all_labels, all_preds)
-    disp = ConfusionMatrixDisplay(confusion_matrix=cm, display_labels=train_dataset.classes)
-    
-    fig, ax = plt.subplots(figsize=(12, 12))
-    disp.plot(ax=ax, xticks_rotation='vertical')
-    plt.title("Balanced CNN Confusion Matrix")
-    plt.tight_layout()
-    plt.show()
+    report(all_labels, all_preds, train_dataset.classes, "Balanced CNN from scratch")
 
 if __name__ == '__main__':
     main()
