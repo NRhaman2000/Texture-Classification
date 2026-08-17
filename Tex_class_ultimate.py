@@ -6,7 +6,7 @@ import torch.optim as optim
 from torchvision.models import convnext_tiny, ConvNeXt_Tiny_Weights
 import torch.nn.functional as F
 import matplotlib.pyplot as plt
-from sklearn.metrics import accuracy_score, confusion_matrix, ConfusionMatrixDisplay
+from eval_utils import set_seed, report
 from torch.optim.lr_scheduler import CosineAnnealingLR
 
 # ---------------------------------------------------------
@@ -30,8 +30,10 @@ test_transform = transforms.Compose([
 ])
 
 print("Loading dataset at 224x224 resolution...")
-train_dataset = torchvision.datasets.DTD(root='./data', split='train', transform=train_transform)
-test_dataset = torchvision.datasets.DTD(root='./data', split='test', transform=test_transform)
+train_dataset = torchvision.datasets.DTD(root='./data', split='train', partition=1,
+                                         transform=train_transform, download=True)
+test_dataset = torchvision.datasets.DTD(root='./data', split='test', partition=1,
+                                        transform=test_transform, download=True)
 
 # Batch size 32 is highly optimized for Apple Silicon MPS
 train_loader = torch.utils.data.DataLoader(train_dataset, batch_size=32, shuffle=True)
@@ -55,8 +57,10 @@ def get_model(num_classes):
     return model
 
 def main():
-    device = torch.device("mps" if torch.backends.mps.is_available() else "cpu")
+    device = torch.device("cuda" if torch.cuda.is_available()
+                          else "mps" if torch.backends.mps.is_available() else "cpu")
     print(f"Using device: {device}")
+    set_seed(42)
 
     model = get_model(num_classes).to(device)
     criterion = nn.CrossEntropyLoss()
@@ -120,20 +124,7 @@ def main():
             all_preds.extend(predicted.cpu().numpy())
             all_labels.extend(labels.numpy())
 
-    accuracy = accuracy_score(all_labels, all_preds)
-    print(f"\n========================================")
-    print(f"ULTIMATE PIPELINE ACCURACY: {accuracy * 100:.2f}%")
-    print(f"========================================\n")
-    
-    print("Generating Final Confusion Matrix...")
-    cm = confusion_matrix(all_labels, all_preds)
-    disp = ConfusionMatrixDisplay(confusion_matrix=cm, display_labels=train_dataset.classes)
-    
-    fig, ax = plt.subplots(figsize=(12, 12))
-    disp.plot(ax=ax, xticks_rotation='vertical')
-    plt.title("ConvNeXt-Tiny + TTA Confusion Matrix")
-    plt.tight_layout()
-    plt.show()
+    report(all_labels, all_preds, train_dataset.classes, "ConvNeXt-Tiny + TTA (bonus)")
 
 if __name__ == '__main__':
     main()

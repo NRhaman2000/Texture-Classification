@@ -133,7 +133,7 @@ def main():
     print("best SVM params:", grid.best_params_)
 
     y_pred = grid.predict(X_test)
-    report(y_test, y_pred, train_dataset.classes, "Classical Gabor+Fourier SVM")
+    report(y_test, y_pred, train_dataset.classes, "Classical Gabor+Fourier+LBP SVM")
 
 if __name__ == '__main__':
     main()
