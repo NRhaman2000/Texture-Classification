@@ -7,9 +7,9 @@ from torchvision.models import resnet50, ResNet50_Weights
 import matplotlib.pyplot as plt
 from eval_utils import set_seed, report
 
-# ---------------------------------------------------------
+# 
 # 1. High-Resolution Transforms (ImageNet Standards)
-# ---------------------------------------------------------
+# 
 # ResNet expects 224x224 images and very specific mathematical normalization
 train_transform = transforms.Compose([
     transforms.Resize(256),
@@ -38,9 +38,9 @@ test_loader = torch.utils.data.DataLoader(test_dataset, batch_size=64, shuffle=F
 
 num_classes = len(train_dataset.classes)
 
-# ---------------------------------------------------------
+# 
 # 2. Setup the Pre-trained ResNet-50
-# ---------------------------------------------------------
+# 
 def get_model(num_classes):
     # Download the massive, pre-trained ResNet-50 model
     model = resnet50(weights=ResNet50_Weights.DEFAULT)
@@ -89,9 +89,9 @@ def main():
             
         print(f"Epoch [{epoch+1}/{epochs}] - Loss: {running_loss/len(train_loader):.4f}")
 
-    # ---------------------------------------------------------
+    # 
     # 3. Evaluate the ResNet Model
-    # ---------------------------------------------------------
+    # 
     print("\nTesting the Transfer Learning Model...")
     model.eval() 
     all_preds = []

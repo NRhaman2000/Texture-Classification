@@ -6,9 +6,7 @@ import torch.optim as optim
 import matplotlib.pyplot as plt
 from sklearn.metrics import accuracy_score, confusion_matrix, ConfusionMatrixDisplay
 
-# ---------------------------------------------------------
 # 1. UPGRADE: Data Augmentation
-# ---------------------------------------------------------
 # We randomly alter the images during training so the network never sees the exact same image twice.
 train_transform = transforms.Compose([
     transforms.Resize((64, 64)),
@@ -35,9 +33,8 @@ test_loader = torch.utils.data.DataLoader(test_dataset, batch_size=32, shuffle=F
 
 num_classes = len(train_dataset.classes)
 
-# ---------------------------------------------------------
+
 # 2. UPGRADE: Architecture with Dropout
-# ---------------------------------------------------------
 class ImprovedTextureCNN(nn.Module):
     def __init__(self, num_classes):
         super(ImprovedTextureCNN, self).__init__()
@@ -77,9 +74,7 @@ def main():
     criterion = nn.CrossEntropyLoss()
     optimizer = optim.Adam(model.parameters(), lr=0.001, weight_decay=1e-4) 
 
-    # ---------------------------------------------------------
     # 3. Training Loop (More Epochs because learning is harder now)
-    # ---------------------------------------------------------
     epochs = 25 
     print("\nStarting Improved Training...")
     
@@ -100,9 +95,7 @@ def main():
             
         print(f"Epoch [{epoch+1}/{epochs}] - Loss: {running_loss/len(train_loader):.4f}")
 
-    # ---------------------------------------------------------
     # 4. Evaluate the Improved CNN
-    # ---------------------------------------------------------
     print("\nTesting the Improved CNN...")
     model.eval() # CRITICAL: This turns off Dropout during testing!
     all_preds = []

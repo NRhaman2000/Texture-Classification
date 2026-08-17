@@ -10,9 +10,7 @@ from skimage.feature import local_binary_pattern
 
 from eval_utils import set_seed, report, plot_gabor_bank
 
-# ---------------------------------------------------------
 # 1. Load the Data (Same as Step 1)
-# ---------------------------------------------------------
 # We convert images to grayscale because Gabor filters look at structure, not color.
 transform = transforms.Compose([
     transforms.Grayscale(num_output_channels=1),
@@ -24,9 +22,8 @@ print("Loading dataset...")
 train_dataset = torchvision.datasets.DTD(root='./data', split='train', partition=1,transform=transform, download=True)
 test_dataset = torchvision.datasets.DTD(root='./data', split='test', partition=1,transform=transform, download=True)
 
-# ---------------------------------------------------------
 # 2. Build the Gabor Filter Bank (The "Hand-Crafted" part)
-# ---------------------------------------------------------
+
 # We create a bank of mathematical filters at different frequencies and angles.
 
 def build_gabor_bank(orientations=6, frequencies=(0.15, 0.25, 0.35, 0.45)):
@@ -38,9 +35,7 @@ def build_gabor_bank(orientations=6, frequencies=(0.15, 0.25, 0.35, 0.45)):
             bank.append(gabor_kernel(f, theta=theta))
     return bank
 
-# ---------------------------------------------------------
 # 3. Feature Extraction Function
-# ---------------------------------------------------------
 # This function runs every single filter over an image and calculates a summary
 def gabor_energy(image, bank):
     """Measure the STRENGTH of each filter's response, not its average."""
@@ -106,9 +101,7 @@ def process_dataset(dataset, bank):
             
     return np.array(X), np.array(y)
 
-# ---------------------------------------------------------
 # 4. Main Execution
-# ---------------------------------------------------------
 def main():
     set_seed(42)
     bank = build_gabor_bank()

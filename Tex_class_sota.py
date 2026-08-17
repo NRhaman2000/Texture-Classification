@@ -8,9 +8,8 @@ import matplotlib.pyplot as plt
 from eval_utils import set_seed, report
 from torch.optim.lr_scheduler import CosineAnnealingLR
 
-# ---------------------------------------------------------
 # 1. Advanced Augmentations
-# ---------------------------------------------------------
+# 
 train_transform = transforms.Compose([
     transforms.Resize(256),
     transforms.RandomResizedCrop(224),
@@ -40,9 +39,9 @@ test_loader = torch.utils.data.DataLoader(test_dataset, batch_size=64, shuffle=F
 
 num_classes = len(train_dataset.classes)
 
-# ---------------------------------------------------------
+# 
 # 2. Modern Backbone & True Fine-Tuning
-# ---------------------------------------------------------
+# 
 def get_model(num_classes):
     # Load the highly optimized EfficientNetV2
     model = efficientnet_v2_s(weights=EfficientNet_V2_S_Weights.DEFAULT)
@@ -98,9 +97,8 @@ def main():
         current_lr = scheduler.get_last_lr()[0]
         print(f"Epoch [{epoch+1}/{epochs}] - Loss: {running_loss/len(train_loader):.4f} - LR: {current_lr:.6f}")
 
-    # ---------------------------------------------------------
+    
     # 3. Evaluate the Model
-    # ---------------------------------------------------------
     print("\nTesting the SOTA Model...")
     model.eval() 
     all_preds = []

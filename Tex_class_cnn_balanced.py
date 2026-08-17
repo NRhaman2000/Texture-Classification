@@ -7,9 +7,7 @@ import torch.nn as nn
 import torch.optim as optim
 
 from eval_utils import set_seed, report, plot_conv1_filters
-# ---------------------------------------------------------
 # 1. Gentle Transforms (Preserves directional textures)
-# ---------------------------------------------------------
 train_transform = transforms.Compose([
     transforms.Resize((64, 64)),
     transforms.RandomHorizontalFlip(), # Light flip only
@@ -34,9 +32,7 @@ test_loader = torch.utils.data.DataLoader(test_dataset, batch_size=32, shuffle=F
 
 num_classes = len(train_dataset.classes)
 
-# ---------------------------------------------------------
 # 2. 3-Layer Balanced CNN Architecture
-# ---------------------------------------------------------
 class BalancedTextureCNN(nn.Module):
     def __init__(self, num_classes):
         super(BalancedTextureCNN, self).__init__()
@@ -88,7 +84,7 @@ def main():
     best_state, best_val = None, -1.0
     print("\nStarting Training...")
     for epoch in range(epochs):
-        # --- learn from the training pile ---
+        # learn from the training pile 
         model.train()
         running_loss = 0.0
         for images, labels in train_loader:
@@ -99,7 +95,7 @@ def main():
             optimizer.step()
             running_loss += loss.item()
 
-        # --- sit the practice test ---
+        #  sit the practice test
         model.eval()
         correct = total = 0
         with torch.no_grad():
@@ -109,7 +105,7 @@ def main():
                 total += labels.size(0)
         val_acc = correct / total
 
-        # --- if this is the best so far, save a snapshot ---
+        # if this is the best so far, save a snapshot
         if val_acc > best_val:
             best_val = val_acc
             best_state = copy.deepcopy(model.state_dict())
@@ -120,7 +116,7 @@ def main():
     torch.save(model.state_dict(), "cnn_best.pth")
     plot_conv1_filters(model.conv1.weight) # saves cnn_conv1_filters.png
 
-    # --- the real exam, taken once ---
+    # the real exam, taken once 
     model.eval()
     all_preds, all_labels = [], []
     with torch.no_grad():

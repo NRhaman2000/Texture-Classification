@@ -6,9 +6,7 @@ import torch.optim as optim
 import matplotlib.pyplot as plt
 from sklearn.metrics import accuracy_score, confusion_matrix, ConfusionMatrixDisplay
 
-# ---------------------------------------------------------
 # 1. Load Data (Deep Learning Needs Color!)
-# ---------------------------------------------------------
 # We keep the 3 color channels (RGB) this time, and resize to 64x64.
 transform = transforms.Compose([
     transforms.Resize((64, 64)),
@@ -27,9 +25,7 @@ test_loader = torch.utils.data.DataLoader(test_dataset, batch_size=32, shuffle=F
 
 num_classes = len(train_dataset.classes)
 
-# ---------------------------------------------------------
 # 2. Define the Shallow CNN Architecture
-# ---------------------------------------------------------
 class ShallowTextureCNN(nn.Module):
     def __init__(self, num_classes):
         super(ShallowTextureCNN, self).__init__()
@@ -58,9 +54,7 @@ class ShallowTextureCNN(nn.Module):
         x = self.fc2(x)
         return x
 
-# ---------------------------------------------------------
 # 3. Setup Training Logic
-# ---------------------------------------------------------
 def main():
     # Automatically use Apple Silicon GPU, Nvidia GPU, or default to CPU
     device = torch.device("mps" if torch.backends.mps.is_available() else "cuda" if torch.cuda.is_available() else "cpu")
@@ -72,9 +66,7 @@ def main():
     criterion = nn.CrossEntropyLoss()
     optimizer = optim.Adam(model.parameters(), lr=0.001)
 
-    # ---------------------------------------------------------
     # 4. The Training Loop (Epochs)
-    # ---------------------------------------------------------
     epochs = 15 # Train for 15 full passes over the dataset
     print("\nStarting Training...")
     
@@ -98,9 +90,7 @@ def main():
     print("Finished Training! Saving model weights...")
     torch.save(model.state_dict(), 'texture_cnn_weights.pth')
 
-    # ---------------------------------------------------------
     # 5. Evaluate the CNN
-    # ---------------------------------------------------------
     print("\nTesting the CNN Classifier...")
     model.eval() # Set model to testing mode (no learning allowed)
     all_preds = []

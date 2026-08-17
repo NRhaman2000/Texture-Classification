@@ -74,9 +74,9 @@ def subset_indices(n, fraction, seed=0):
     return rng.permutation(n)[: int(round(n * fraction))]
 
 
-# =========================================================
+# 
 # A) CLASSICAL
-# =========================================================
+# 
 def build_feature_cache():
     """Extract classical features once for train and test; save to disk."""
     if os.path.exists(CACHE_FILE):
@@ -137,9 +137,9 @@ def run_classical(fraction, Xtr, ytr, Xte, yte):
     }
 
 
-# =========================================================
+# 
 # B/C) CNN
-# =========================================================
+# 
 class BalancedTextureCNN(nn.Module):
     def __init__(self, num_classes):
         super().__init__()

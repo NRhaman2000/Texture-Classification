@@ -9,9 +9,9 @@ import matplotlib.pyplot as plt
 from eval_utils import set_seed, report
 from torch.optim.lr_scheduler import CosineAnnealingLR
 
-# ---------------------------------------------------------
+# 
 # 1. Fast & Stable Transforms (224x224)
-# ---------------------------------------------------------
+# 
 IMG_SIZE = 224
 
 train_transform = transforms.Compose([
@@ -41,9 +41,9 @@ test_loader = torch.utils.data.DataLoader(test_dataset, batch_size=32, shuffle=F
 
 num_classes = len(train_dataset.classes)
 
-# ---------------------------------------------------------
+# 
 # 2. ConvNeXt-Tiny Backbone
-# ---------------------------------------------------------
+# 
 def get_model(num_classes):
     print("Downloading ConvNeXt-Tiny weights...")
     model = convnext_tiny(weights=ConvNeXt_Tiny_Weights.DEFAULT)
@@ -99,9 +99,9 @@ def main():
         current_lr = scheduler.get_last_lr()[0]
         print(f"--- Epoch {epoch+1} Complete | Avg Loss: {running_loss/total_batches:.4f} | LR: {current_lr:.6f} ---")
 
-    # ---------------------------------------------------------
+    # 
     # 3. Test-Time Augmentation (TTA) Evaluation
-    # ---------------------------------------------------------
+    # 
     print("\nTesting with Test-Time Augmentation (TTA)...")
     model.eval() 
     all_preds = []
